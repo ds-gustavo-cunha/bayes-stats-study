@@ -125,8 +125,8 @@ class ABTest:
     def plot_ab_dists(self, fig, ax, st_empty_obj=None, stats_title: bool = False):
         # define style to use
         plt.style.use("fivethirtyeight")
-        # define figure layout
-        fig, ax = plt.subplots()
+        # clear axis - sanity check
+        ax.clear()
         # plot treatment and control distributions
         sns.kdeplot(
             x=self.control_bbc.posterior_dist, color="r", label="control", ax=ax

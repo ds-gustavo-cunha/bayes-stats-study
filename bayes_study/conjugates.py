@@ -105,6 +105,8 @@ class BetaBernoulliConjugate:
     def plot_dists(self, fig, ax, st_empty_obj=None):
         # define style to use
         plt.style.use("fivethirtyeight")
+        # clear axis - sanity check
+        ax.clear()
         # plot figures
         sns.kdeplot(
             x=self.prior_dist,
@@ -144,8 +146,9 @@ class BetaBernoulliConjugate:
             f"Prior: beta({self.prior_alpha}, {self.prior_beta})\n"
             f"Likelihood dist: bernoulli(p={self.likelihood_prob}, size={self.likelihood_trials})\n"
             f"Likelihood iter: success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success}\n"
-            f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})",
-            loc="left",
+            f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})\n"
+            f"Sample iteration: {self.sample_iter['posterior']}",
+            loc="left"
         )
         plt.legend(bbox_to_anchor=(1.01, 1))
         plt.xticks([i / 10 for i in range(0, 10 + 1)])
