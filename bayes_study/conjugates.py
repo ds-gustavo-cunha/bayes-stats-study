@@ -9,39 +9,42 @@ import seaborn as sns
 import streamlit as st
 from scipy.stats import beta, bernoulli
 from bayes_study.validators.conjugates_validators import (
-    BetaBernoulliConjugateParams, 
-    BetaBernoulliConjugatePlotDists
+    BetaBernoulliConjugateParams,
+    BetaBernoulliConjugatePlotDists,
 )
 
 #####################
 ####### CLASS #######
 
 
-class BetaBernoulliConjugate():
-    def __init__(self, 
+class BetaBernoulliConjugate:
+    def __init__(
+        self,
         prior_alpha: int,
         prior_beta: int,
         likelihood_dist: Union[List[int], None] = None,
-        likelihood_prob: Union[float, None] = None, 
+        likelihood_prob: Union[float, None] = None,
         likelihood_trials: Union[int, None] = None,
-        sampling_size: int = 10_000
-    ) -> None:   
+        sampling_size: int = 10_000,
+    ) -> None:
         # validate the input parameters
         validated_params = BetaBernoulliConjugateParams(
             prior_alpha=prior_alpha,
             prior_beta=prior_beta,
             likelihood_dist=likelihood_dist,
-            likelihood_prob=likelihood_prob, 
+            likelihood_prob=likelihood_prob,
             likelihood_trials=likelihood_trials,
-            sampling_size=sampling_size
-        ) 
+            sampling_size=sampling_size,
+        )
         # define object attributes
         self.prior_alpha = validated_params.prior_alpha
         self.prior_beta = validated_params.prior_beta
         if validated_params.likelihood_dist is not None:
             self.likelihood_prob = np.mean(np.array(validated_params.likelihood_dist))
             self.likelihood_trials = len(np.array(validated_params.likelihood_dist))
-        elif (validated_params.likelihood_prob is not None) and (validated_params.likelihood_trials is not None):
+        elif (validated_params.likelihood_prob is not None) and (
+            validated_params.likelihood_trials is not None
+        ):
             self.likelihood_prob = validated_params.likelihood_prob
             self.likelihood_trials = validated_params.likelihood_trials
         else:
@@ -49,7 +52,7 @@ class BetaBernoulliConjugate():
                 "At least `likelihood_dist` param or both "
                 "`likelihood_prob and likelihood_trails` params "
                 "must not be None!"
-                )
+            )
         self.sampling_size = validated_params.sampling_size
         # define a dict to control paired samples
         self.sample_iter = dict(prior=0, likelihood=0, posterior=0)
@@ -129,18 +132,26 @@ class BetaBernoulliConjugate():
             f"Sample iteration: {self.sample_iter}"
         )
 
-    def plot_dists(self, 
-        fig, ax, st_empty_obj = None,
-        plot_prior: bool = True, 
-        plot_posterior: bool = True
+    def plot_dists(
+        self,
+        fig,
+        ax,
+        st_empty_obj=None,
+        plot_prior: bool = True,
+        plot_posterior: bool = True,
     ):
         # validate inputs
         params = BetaBernoulliConjugatePlotDists(
-            fig=fig, ax=ax, st_empty_obj=st_empty_obj,
-            plot_prior=plot_prior, plot_posterior=plot_posterior
+            fig=fig,
+            ax=ax,
+            st_empty_obj=st_empty_obj,
+            plot_prior=plot_prior,
+            plot_posterior=plot_posterior,
         )
         # define style to use
         plt.style.use("fivethirtyeight")
+        # define font
+        plt.rcParams["font.family"] = "monospace"
         # clear axis - sanity check
         params.ax.clear()
         # plot figures
@@ -180,14 +191,16 @@ class BetaBernoulliConjugate():
             linewidth=1.5,
             label="Likelihood prob",
         )
-        prior_msg = f"Prior: beta({self.prior_alpha}, {self.prior_beta})\n"
-        posterior_msg = f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})\n"
+        prior_msg = (
+            f"Prior:               beta({self.prior_alpha}, {self.prior_beta})\n"
+        )
+        posterior_msg = f"Posterior:           beta({self.posterior_alpha}, {self.posterior_beta})\n"
         plt.title(
             f"{prior_msg if params.plot_prior else ''}"
             f"Likelihood dist: bernoulli(p={self.likelihood_prob}, size={self.likelihood_trials})\n"
-            f"Likelihood iter: success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success}\n"
+            f"Likelihood iter: (success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success})\n"
             f"{posterior_msg if params.plot_posterior else ''}"
-            f"Sample iteration: {self.sample_iter['posterior']}",
+            f"Sample iteration:          {self.sample_iter['posterior']}",
             loc="left",
         )
         plt.legend(bbox_to_anchor=(1.01, 1))
