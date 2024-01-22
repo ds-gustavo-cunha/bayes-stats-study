@@ -1,12 +1,13 @@
 #######################
 ####### IMPORTS #######
 from typing import List, Dict, Union
+from pydantic import BaseModel
 import numpy as np
+from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
-from PIL import Image
-from scipy.stats import beta, bernoulli
 import streamlit as st
+from scipy.stats import beta, bernoulli
 from bayes_study.validators.conjugates_validators import (
     BetaBernoulliConjugateParams, 
     BetaBernoulliConjugatePlotDists
@@ -16,16 +17,30 @@ from bayes_study.validators.conjugates_validators import (
 ####### CLASS #######
 
 
-class BetaBernoulliConjugate:
-    def __init__(self, **params) -> None:
+class BetaBernoulliConjugate():
+    def __init__(self, 
+        prior_alpha: int,
+        prior_beta: int,
+        likelihood_dist: Union[List[int], None] = None,
+        likelihood_prob: Union[float, None] = None, 
+        likelihood_trials: Union[int, None] = None,
+        sampling_size: int = 10_000
+    ) -> None:   
         # validate the input parameters
-        validated_params = BetaBernoulliConjugateParams(**params)      
+        validated_params = BetaBernoulliConjugateParams(
+            prior_alpha=prior_alpha,
+            prior_beta=prior_beta,
+            likelihood_dist=likelihood_dist,
+            likelihood_prob=likelihood_prob, 
+            likelihood_trials=likelihood_trials,
+            sampling_size=sampling_size
+        ) 
         # define object attributes
         self.prior_alpha = validated_params.prior_alpha
         self.prior_beta = validated_params.prior_beta
         if validated_params.likelihood_dist is not None:
-            self.likelihood_prob = np.mean(validated_params.likelihood_dist)
-            self.likelihood_trials = len(validated_params.likelihood_dist)
+            self.likelihood_prob = np.mean(np.array(validated_params.likelihood_dist))
+            self.likelihood_trials = len(np.array(validated_params.likelihood_dist))
         elif (validated_params.likelihood_prob is not None) and (validated_params.likelihood_trials is not None):
             self.likelihood_prob = validated_params.likelihood_prob
             self.likelihood_trials = validated_params.likelihood_trials
@@ -114,9 +129,16 @@ class BetaBernoulliConjugate:
             f"Sample iteration: {self.sample_iter}"
         )
 
-    def plot_dists(self, **kwargs):
+    def plot_dists(self, 
+        fig, ax, st_empty_obj = None,
+        plot_prior: bool = True, 
+        plot_posterior: bool = True
+    ):
         # validate inputs
-        params = BetaBernoulliConjugatePlotDists(**kwargs)
+        params = BetaBernoulliConjugatePlotDists(
+            fig=fig, ax=ax, st_empty_obj=st_empty_obj,
+            plot_prior=plot_prior, plot_posterior=plot_posterior
+        )
         # define style to use
         plt.style.use("fivethirtyeight")
         # clear axis - sanity check

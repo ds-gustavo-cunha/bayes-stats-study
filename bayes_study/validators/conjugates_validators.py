@@ -49,7 +49,7 @@ class BetaBernoulliConjugateParams(BaseModel, extra="forbid"):
                         " either 0s or 1s. "
                         f"Found `{i}`."
                         )
-        return np.array(value)
+        return value
     
 
 class BetaBernoulliConjugatePlotDists(BaseModel, extra="forbid"):
