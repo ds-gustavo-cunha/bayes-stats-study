@@ -7,29 +7,35 @@ import seaborn as sns
 from PIL import Image
 from scipy.stats import beta, bernoulli
 import streamlit as st
-
+from bayes_study.validators.conjugates_validators import (
+    BetaBernoulliConjugateParams, 
+    BetaBernoulliConjugatePlotDists
+)
 
 #####################
 ####### CLASS #######
 
 
 class BetaBernoulliConjugate:
-    def __init__(
-        self,
-        prior_alpha: int,
-        prior_beta: int,
-        likelihood_prob: float,
-        likelihood_trials: int,
-        sampling_size: int,
-    ) -> None:
+    def __init__(self, **params) -> None:
+        # validate the input parameters
+        validated_params = BetaBernoulliConjugateParams(**params)      
         # define object attributes
-        self.prior_alpha = prior_alpha
-        self.prior_beta = prior_beta
-        self.likelihood_prob = likelihood_prob
-        self.likelihood_trials = likelihood_trials
-        self.sampling_size = sampling_size
-        # self.posterior_alpha = prior_alpha
-        # self.posterior_beta = prior_beta
+        self.prior_alpha = validated_params.prior_alpha
+        self.prior_beta = validated_params.prior_beta
+        if validated_params.likelihood_dist is not None:
+            self.likelihood_prob = np.mean(validated_params.likelihood_dist)
+            self.likelihood_trials = len(validated_params.likelihood_dist)
+        elif (validated_params.likelihood_prob is not None) and (validated_params.likelihood_trials is not None):
+            self.likelihood_prob = validated_params.likelihood_prob
+            self.likelihood_trials = validated_params.likelihood_trials
+        else:
+            raise ValueError(
+                "At least `likelihood_dist` param or both "
+                "`likelihood_prob and likelihood_trails` params "
+                "must not be None!"
+                )
+        self.sampling_size = validated_params.sampling_size
         # define a dict to control paired samples
         self.sample_iter = dict(prior=0, likelihood=0, posterior=0)
         # sample from prior and likelihood and posterior
@@ -108,38 +114,42 @@ class BetaBernoulliConjugate:
             f"Sample iteration: {self.sample_iter}"
         )
 
-    def plot_dists(self, fig, ax, st_empty_obj=None):
+    def plot_dists(self, **kwargs):
+        # validate inputs
+        params = BetaBernoulliConjugatePlotDists(**kwargs)
         # define style to use
         plt.style.use("fivethirtyeight")
         # clear axis - sanity check
-        ax.clear()
+        params.ax.clear()
         # plot figures
-        sns.kdeplot(
-            x=self.prior_dist,
-            label="prior",
-            color="b",
-            common_norm=True,
-            fill=False,
-            ax=ax,
-        )
+        if params.plot_prior:
+            sns.kdeplot(
+                x=self.prior_dist,
+                label="prior",
+                color="b",
+                common_norm=True,
+                fill=False,
+                ax=params.ax,
+            )
         sns.kdeplot(
             x=self.likelihood_dist,
             label="likelihood",
             color="y",
             common_norm=True,
             fill=True,
-            ax=ax,
+            ax=params.ax,
         )
-        sns.kdeplot(
-            x=self.posterior_dist,
-            label="posterior",
-            color="r",
-            common_norm=True,
-            fill=False,
-            ax=ax,
-        )
+        if params.plot_posterior:
+            sns.kdeplot(
+                x=self.posterior_dist,
+                label="posterior",
+                color="r",
+                common_norm=True,
+                fill=False,
+                ax=params.ax,
+            )
         # define plot details
-        ax.axvline(
+        params.ax.axvline(
             x=self.likelihood_prob,
             ymin=0,
             ymax=1,
@@ -148,11 +158,13 @@ class BetaBernoulliConjugate:
             linewidth=1.5,
             label="Likelihood prob",
         )
+        prior_msg = f"Prior: beta({self.prior_alpha}, {self.prior_beta})\n"
+        posterior_msg = f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})\n"
         plt.title(
-            f"Prior: beta({self.prior_alpha}, {self.prior_beta})\n"
+            f"{prior_msg if params.plot_prior else ''}"
             f"Likelihood dist: bernoulli(p={self.likelihood_prob}, size={self.likelihood_trials})\n"
             f"Likelihood iter: success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success}\n"
-            f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})\n"
+            f"{posterior_msg if params.plot_posterior else ''}"
             f"Sample iteration: {self.sample_iter['posterior']}",
             loc="left",
         )
@@ -173,7 +185,9 @@ class BetaBernoulliConjugate:
         #         width=None, use_column_width=False,
         #         clamp=False, channels="RGB", output_format="auto"
         #     )
-        if st_empty_obj is not None:
-            st_empty_obj.pyplot(fig=fig, clear_figure=None, use_container_width=False)
+        if params.st_empty_obj is not None:
+            params.st_empty_obj.pyplot(
+                fig=params.fig, clear_figure=None, use_container_width=False
+            )
         else:
             plt.show()
