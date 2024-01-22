@@ -28,10 +28,16 @@ class BetaBernoulliConjugate:
         self.likelihood_prob = likelihood_prob
         self.likelihood_trials = likelihood_trials
         self.sampling_size = sampling_size
-        self.posterior_alpha = prior_alpha
-        self.posterior_beta = prior_beta
+        # self.posterior_alpha = prior_alpha
+        # self.posterior_beta = prior_beta
         # define a dict to control paired samples
         self.sample_iter = dict(prior=0, likelihood=0, posterior=0)
+        # sample from prior and likelihood and posterior
+        # so as to be able to display report and plot
+        # with no updates
+        self.sample_prior()
+        self.sample_likelihood()
+        self.sample_posterior()
 
     def sample_prior(self):
         # sample from betar prior given inputs
@@ -83,7 +89,7 @@ class BetaBernoulliConjugate:
 
     def update_distributions(self):
         # update prior distribution to be equal to
-        # previous posterior update
+        # previous previous posterior
         self.update_prior()
         # sample prior distribution
         self.sample_prior()
@@ -148,7 +154,7 @@ class BetaBernoulliConjugate:
             f"Likelihood iter: success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success}\n"
             f"Posterior: beta({self.posterior_alpha}, {self.posterior_beta})\n"
             f"Sample iteration: {self.sample_iter['posterior']}",
-            loc="left"
+            loc="left",
         )
         plt.legend(bbox_to_anchor=(1.01, 1))
         plt.xticks([i / 10 for i in range(0, 10 + 1)])
