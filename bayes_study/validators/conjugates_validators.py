@@ -57,9 +57,7 @@ class BetaBernoulliConjugateParams(BaseModel, extra="forbid"):
 class BetaBernoulliConjugatePlotDists(BaseModel, extra="forbid"):
     fig: Any = Field(default=..., description="matplotlib.figure.Figure")
     ax: Any = Field(default=..., description="matplotlib.axes._axes.Axes")
-    st_empty_obj: Union[Any, None] = Field(
-        default=None, description="streamlit.delta_generator.DeltaGenerator"
-    )
+
     plot_prior: bool = Field(
         default=True,
         description="Boolean to indicate whether to plot prior distribution.",

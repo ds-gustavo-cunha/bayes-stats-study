@@ -14,9 +14,6 @@ from bayes_study.validators.ab_test_validators import (
     PlotAbDistsParams,
 )
 
-# from bayes_study.validators import ab_test_validators
-import streamlit as st
-
 
 #####################
 ####### CLASS #######
@@ -164,10 +161,10 @@ class ABTest:
         # return ab stats except the distributions
         return {k: v for k, v in self.ab_stats.items() if not k.endswith("dist")}
 
-    def plot_ab_dists(self, fig, axs, st_empty_obj=None, stats_title: bool = False):
+    def plot_ab_dists(self, fig, axs, stats_title: bool = False):
         # validate inputs
         validated_params = PlotAbDistsParams(
-            fig=fig, axs=axs, st_empty_obj=st_empty_obj, stats_title=stats_title
+            fig=fig, axs=axs, stats_title=stats_title
         )
 
         # define style to use
@@ -209,8 +206,8 @@ class ABTest:
             title = f"Distributions:\n{control_report}\n{treatment_report}"
         # plot details
         validated_params.axs[0].set_title(title, loc="left")
+        validated_params.axs[0].set_ylabel("Probability\ndensity", loc="bottom")
         validated_params.axs[0].set_xlabel("Parameter Value", loc="left")
-        validated_params.axs[0].set_ylabel("Probability Density", loc="top")
         validated_params.axs[0].axvline(
             x=self.control_bbc.likelihood_prob,
             ymin=0,
@@ -276,18 +273,13 @@ class ABTest:
             label="ROPE lower limit",
         )
         lift_report_title = (
-            f"Lift distribution:\n"
+            f"\nLift distribution:\n"
             f"  Lift mean         {self.bayes_stats['lift_mean']:.2f}\n"
             f"  Lift interval     [{self.bayes_stats['lift_cred_lower_limit']:.2f}, {self.bayes_stats['lift_cred_upper_limit']:.2f}]\n"
-            f"  ROPE interval     [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]\n"
+            f"  ROPE interval     [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]"
         )
         validated_params.axs[1].set_title(lift_report_title, loc="left")
+        validated_params.axs[1].set_ylabel("Probability\ndensity", loc="bottom")
         validated_params.axs[1].set_xlabel("Parameter Value", loc="left")
-        validated_params.axs[1].set_ylabel("Probability Density", loc="top")
         validated_params.axs[1].legend(bbox_to_anchor=(1.01, 1))
-        if validated_params.st_empty_obj is not None:
-            validated_params.st_empty_obj.pyplot(
-                fig=validated_params.fig, clear_figure=None, use_container_width=False
-            )
-        else:
-            plt.show()
+        plt.show()

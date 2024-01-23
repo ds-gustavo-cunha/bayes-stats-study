@@ -136,7 +136,6 @@ class BetaBernoulliConjugate:
         self,
         fig,
         ax,
-        st_empty_obj=None,
         plot_prior: bool = True,
         plot_posterior: bool = True,
     ):
@@ -144,7 +143,6 @@ class BetaBernoulliConjugate:
         params = BetaBernoulliConjugatePlotDists(
             fig=fig,
             ax=ax,
-            st_empty_obj=st_empty_obj,
             plot_prior=plot_prior,
             plot_posterior=plot_posterior,
         )
@@ -203,26 +201,9 @@ class BetaBernoulliConjugate:
             f"Sample iteration:   {self.sample_iter['posterior']}",
             loc="left",
         )
+        plt.ylabel("Probability\ndensity", loc="bottom")
+        plt.xlabel("Parameter Value", loc="left")
         plt.legend(bbox_to_anchor=(1.01, 1))
         plt.xticks([i / 10 for i in range(0, 10 + 1)])
         plt.xlim(-0.01, 1.01)
-        # workaround to control streamlit figure size
-        # https://stackoverflow.com/questions/71566299/how-to-decrease-plot-size-in-streamlit
-        # fig.savefig(
-        #     fname="bayes_formulae.png",
-        #     transparent=False, dpi='figure', format="png",
-        #     pad_inches=0.1, facecolor='auto', edgecolor='auto'
-        #     )
-        # bayse_formulae_plot = Image.open('figure_name.png')
-        # if st_empty_obj is not None:
-        #     st_empty_obj.image(
-        #         image=bayse_formulae_plot, caption=None,
-        #         width=None, use_column_width=False,
-        #         clamp=False, channels="RGB", output_format="auto"
-        #     )
-        if params.st_empty_obj is not None:
-            params.st_empty_obj.pyplot(
-                fig=params.fig, clear_figure=None, use_container_width=False
-            )
-        else:
-            plt.show()
+        plt.show()
