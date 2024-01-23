@@ -30,7 +30,7 @@ class CalculateFrequentistStatsParams(BaseModel, extra="forbid"):
 
 class PlotAbDistsParams(BaseModel, extra="forbid"):
     fig: Any = Field(default=..., description="matplotlib.figure.Figure")
-    ax: Any = Field(default=..., description="matplotlib.axes._axes.Axes")
+    axs: Any = Field(default=..., description="matplotlib.axes._axes.Axes")
     st_empty_obj: Union[Any, None] = Field(
         default=None, description="streamlit.delta_generator.DeltaGenerator"
     )

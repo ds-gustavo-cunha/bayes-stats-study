@@ -164,10 +164,10 @@ class ABTest:
         # return ab stats except the distributions
         return {k: v for k, v in self.ab_stats.items() if not k.endswith("dist")}
 
-    def plot_ab_dists(self, fig, ax, st_empty_obj=None, stats_title: bool = False):
+    def plot_ab_dists(self, fig, axs, st_empty_obj=None, stats_title: bool = False):
         # validate inputs
         validated_params = PlotAbDistsParams(
-            fig=fig, ax=ax, st_empty_obj=st_empty_obj, stats_title=stats_title
+            fig=fig, axs=axs, st_empty_obj=st_empty_obj, stats_title=stats_title
         )
 
         # define style to use
@@ -175,44 +175,43 @@ class ABTest:
         # define font
         plt.rcParams["font.family"] = "monospace"
         # clear axis - sanity check
-        validated_params.ax.clear()
+        validated_params.axs[0].clear()
+        validated_params.axs[1].clear()
         # plot treatment and control distributions
         sns.kdeplot(
             x=self.control_bbc.posterior_dist,
             color="r",
             label="control",
-            ax=validated_params.ax,
+            ax=validated_params.axs[0],
         )
         sns.kdeplot(
             x=self.treatment_bbc.posterior_dist,
             color="b",
             label="treatment",
-            ax=validated_params.ax,
+            ax=validated_params.axs[0],
         )
         # define title variables
-        control_report = f"Control:                       Beta({self.control_bbc.posterior_alpha}, {self.control_bbc.posterior_beta})"
-        treatment_report = f"Treatment:                     Beta({self.treatment_bbc.posterior_alpha}, {self.treatment_bbc.posterior_beta})"
+        control_report = f"  Control                     Beta({self.control_bbc.posterior_alpha}, {self.control_bbc.posterior_beta})"
+        treatment_report = f"  Treatment                   Beta({self.treatment_bbc.posterior_alpha}, {self.treatment_bbc.posterior_beta})"
         stats_report_title = (
             f"Bayes results:\n"
-            f"  Probability of T better C:   {self.bayes_stats['probab_t_better_c']*100:.2f}%\n"
-            f"  Expected loss:               {self.bayes_stats['expected_loss']*100:.2f}%\n"
-            f"  Expected uplift:             {self.bayes_stats['uplift_t']*100:.2f}%\n"
-            f"  Lift interval:               [{self.bayes_stats['lift_cred_lower_limit']:.2f}, {self.bayes_stats['lift_cred_upper_limit']:.2f}]\n"
-            f"  ROPE interval:               [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]\n"
+            f"  Probability of T better C   {self.bayes_stats['probab_t_better_c']*100:.2f}%\n"
+            f"  Expected loss               {self.bayes_stats['expected_loss']*100:.2f}%\n"
+            f"  Expected uplift             {self.bayes_stats['uplift_t']*100:.2f}%\n"
             f"Frequentist results:\n"
-            f"  P-value:                     {self.freq_stats['p_value']:.3f}\n"
-            f"  Power:                       {self.freq_stats['power']:.3f}"
+            f"  P-value                     {self.freq_stats['p_value']:.3f}\n"
+            f"  Power                       {self.freq_stats['power']:.3f}"
         )
         # plot details
         if validated_params.stats_title:
-            title = f"{control_report}\n{treatment_report}\n{stats_report_title}"
+            title = f"Distributions:\n{control_report}\n{treatment_report}\n{stats_report_title}"
         else:
-            title = f"{control_report}\n{treatment_report}"
+            title = f"Distributions:\n{control_report}\n{treatment_report}"
         # plot details
-        validated_params.ax.set_title(title, loc="left")
-        validated_params.ax.set_xlabel("Parameter Value", loc="left")
-        validated_params.ax.set_ylabel("Probability Density", loc="top")
-        validated_params.ax.axvline(
+        validated_params.axs[0].set_title(title, loc="left")
+        validated_params.axs[0].set_xlabel("Parameter Value", loc="left")
+        validated_params.axs[0].set_ylabel("Probability Density", loc="top")
+        validated_params.axs[0].axvline(
             x=self.control_bbc.likelihood_prob,
             ymin=0,
             ymax=1,
@@ -221,7 +220,7 @@ class ABTest:
             linewidth=1.5,
             label="Real control prob",
         )
-        validated_params.ax.axvline(
+        validated_params.axs[0].axvline(
             x=self.treatment_bbc.likelihood_prob,
             ymin=0,
             ymax=1,
@@ -230,9 +229,62 @@ class ABTest:
             linewidth=1.5,
             label="Real treatment prob",
         )
-        validated_params.ax.set_xlim(-0.1, 1.1)
-        validated_params.ax.set_xticks([i / 10 for i in range(0, 11, 1)])
-        validated_params.ax.legend(bbox_to_anchor=(1.01, 1))
+        validated_params.axs[0].set_xlim(-0.1, 1.1)
+        validated_params.axs[0].set_xticks([i / 10 for i in range(0, 11, 1)])
+        validated_params.axs[0].legend(bbox_to_anchor=(1.01, 1))
+        # plot lift dist distribution
+        sns.kdeplot(
+            x=self.bayes_stats["lift_dist"],
+            color="g",
+            ax=validated_params.axs[1],
+            linewidth=1.5
+        )
+        # get lift kde
+        lift_kde =  axs[1].get_lines()[0]
+        # get boolean kde within confidence interval
+        lift_kde_conf_int_bool = (
+            lift_kde.get_xdata() >= self.bayes_stats["lift_cred_lower_limit"]
+        ) & (
+            lift_kde.get_xdata() <= self.bayes_stats["lift_cred_upper_limit"]
+        )
+        # filter x and y data with kde boolean
+        lift_kde_conf_int_x = lift_kde.get_xdata()[lift_kde_conf_int_bool]
+        lift_kde_conf_int_y = lift_kde.get_ydata()[lift_kde_conf_int_bool]
+        axs[1].fill_between(
+            x=lift_kde_conf_int_x, 
+            y1=0, 
+            y2=lift_kde_conf_int_y, 
+            color="g"
+        )
+        # plot details
+        validated_params.axs[1].axvline(
+            x=self.bayes_stats["lift_rope_lower_limit"],
+            ymin=0,
+            ymax=1,
+            color="black",
+            linestyle="--",
+            linewidth=1.5,
+            label="ROPE lower limit",
+        )
+        validated_params.axs[1].axvline(
+            x=self.bayes_stats["lift_rope_upper_limit"],
+            ymin=0,
+            ymax=1,
+            color="black",
+            linestyle="--",
+            linewidth=1.5,
+            label="ROPE lower limit",
+        )
+        lift_report_title = (
+            f"Lift distribution:\n"
+            f"  Lift mean         {self.bayes_stats['lift_mean']:.2f}\n"
+            f"  Lift interval     [{self.bayes_stats['lift_cred_lower_limit']:.2f}, {self.bayes_stats['lift_cred_upper_limit']:.2f}]\n"
+            f"  ROPE interval     [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]\n"
+        )
+        validated_params.axs[1].set_title(lift_report_title, loc="left")
+        validated_params.axs[1].set_xlabel("Parameter Value", loc="left")
+        validated_params.axs[1].set_ylabel("Probability Density", loc="top")
+        validated_params.axs[1].legend(bbox_to_anchor=(1.01, 1))
         if validated_params.st_empty_obj is not None:
             validated_params.st_empty_obj.pyplot(
                 fig=validated_params.fig, clear_figure=None, use_container_width=False
