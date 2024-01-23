@@ -190,15 +190,15 @@ class ABTest:
             ax=validated_params.ax,
         )
         # define title variables
-        control_report = f"Control:                     Beta({self.control_bbc.posterior_alpha}, {self.control_bbc.posterior_beta})"
-        treatment_report = f"Treatment:                   Beta({self.treatment_bbc.posterior_alpha}, {self.treatment_bbc.posterior_beta})"
+        control_report = f"Control:                       Beta({self.control_bbc.posterior_alpha}, {self.control_bbc.posterior_beta})"
+        treatment_report = f"Treatment:                     Beta({self.treatment_bbc.posterior_alpha}, {self.treatment_bbc.posterior_beta})"
         stats_report_title = (
             f"Bayes results:\n"
             f"  Probability of T better C:   {self.bayes_stats['probab_t_better_c']*100:.2f}%\n"
             f"  Expected loss:               {self.bayes_stats['expected_loss']*100:.2f}%\n"
             f"  Expected uplift:             {self.bayes_stats['uplift_t']*100:.2f}%\n"
-            f"  Lift interval:            [{self.bayes_stats['lift_cred_lower_limit']:.2f}, {self.bayes_stats['lift_cred_upper_limit']:.2f}]\n"
-            f"  ROPE interval:            [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]\n"
+            f"  Lift interval:               [{self.bayes_stats['lift_cred_lower_limit']:.2f}, {self.bayes_stats['lift_cred_upper_limit']:.2f}]\n"
+            f"  ROPE interval:               [{self.bayes_stats['lift_rope_lower_limit']:.2f}, {self.bayes_stats['lift_rope_upper_limit']:.2f}]\n"
             f"Frequentist results:\n"
             f"  P-value:                     {self.freq_stats['p_value']:.3f}\n"
             f"  Power:                       {self.freq_stats['power']:.3f}"

@@ -192,15 +192,15 @@ class BetaBernoulliConjugate:
             label="Likelihood prob",
         )
         prior_msg = (
-            f"Prior:               beta({self.prior_alpha}, {self.prior_beta})\n"
+            f"Prior:              beta({self.prior_alpha},{self.prior_beta})\n"
         )
-        posterior_msg = f"Posterior:           beta({self.posterior_alpha}, {self.posterior_beta})\n"
+        posterior_msg = f"Posterior:          beta({self.posterior_alpha},{self.posterior_beta})\n"
         plt.title(
             f"{prior_msg if params.plot_prior else ''}"
-            f"Likelihood dist: bernoulli(p={self.likelihood_prob}, size={self.likelihood_trials})\n"
-            f"Likelihood iter: (success={self.likelihood_success}, failure={self.likelihood_trials-self.likelihood_success})\n"
+            f"Likelihood dist:    bernoulli(p={self.likelihood_prob},size={self.likelihood_trials})\n"
+            f"Likelihood iter:    success={self.likelihood_success},failure={self.likelihood_trials-self.likelihood_success}\n"
             f"{posterior_msg if params.plot_posterior else ''}"
-            f"Sample iteration:          {self.sample_iter['posterior']}",
+            f"Sample iteration:   {self.sample_iter['posterior']}",
             loc="left",
         )
         plt.legend(bbox_to_anchor=(1.01, 1))
