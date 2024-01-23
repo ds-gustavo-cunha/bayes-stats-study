@@ -45,7 +45,7 @@ treatment_bbc = BetaBernoulliConjugate(
     sampling_size=cli_args.sampling_size
 )
 
-def update_plots(frame, fig, axs):
+def update_plots(frame, control_bbc, treatment_bbc, fig, axs):
     # each time update posterior distributions for both conjugates
     control_bbc.update_distributions()
     treatment_bbc.update_distributions()
@@ -75,6 +75,8 @@ if __name__ == "__main__":
         fig=fig,
         func=partial(
             update_plots,
+            control_bbc=control_bbc,
+            treatment_bbc=treatment_bbc,
             fig=fig,
             axs=axs
         ),
