@@ -1,10 +1,11 @@
 # import required libs
 from typing import List, Dict, Union, Any
 from pydantic import BaseModel, Field, field_validator
-from bayes_study.conjugates import BetaBernoulliConjugateParams, BetaBernoulliConjugate
+from bayes_study.conjugates import BetaBernoulliConjugate
 import numpy as np
 
 
+# define pydantic classes
 class CalculateBayesianStatsParams(BaseModel, extra="forbid"):
     credible_interval: int = Field(
         default=95,
