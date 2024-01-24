@@ -10,12 +10,12 @@ class CalculateBayesianStatsParams(BaseModel, extra="forbid"):
         default=95,
         ge=0,
         le=100,
-        description="Credible interval for ABTest.calculate_bayesian_stats method.",
+        description="Bayesian credible interval.",
     )
     rope: int = Field(
         default=3,
         ge=0,
-        description="Credible interval for ABTest.calculate_bayesian_stats method.",
+        description="Bayesian Region Of Practical Equivalence (ROPE).",
     )
 
 
@@ -24,7 +24,7 @@ class CalculateFrequentistStatsParams(BaseModel, extra="forbid"):
         default=5,
         ge=0,
         le=100,
-        description="Significance level for ABTest.calculate_frequentist_stats method.",
+        description="Frequentist significance level for a hypothesis test.",
     )
 
 
@@ -33,5 +33,5 @@ class PlotAbDistsParams(BaseModel, extra="forbid"):
     axs: Any = Field(default=..., description="matplotlib.axes._axes.Axes")
     stats_title: bool = Field(
         default=True,
-        description="Boolean to indicate whether to plot stats report on title.",
+        description="Boolean to indicate whether to print statistical results on plot title.",
     )

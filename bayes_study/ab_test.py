@@ -23,6 +23,17 @@ class ABTest:
         control_data: BetaBernoulliConjugate,
         treatment_data: BetaBernoulliConjugate,
     ):
+        """
+        Class to create AB test comparision between frequentist and bayesian approach.
+
+        Args
+            control_data: BetaBernoulliConjugate
+                A bayes_study.conjugates.BetaBernoulliConjugate object instance
+                with control data.
+            treatment_data: BetaBernoulliConjugate
+                A bayes_study.conjugates.BetaBernoulliConjugate object instance
+                with treatment data.
+        """
         # sanity check
         if (not isinstance(control_data, BetaBernoulliConjugate)) or (
             not isinstance(treatment_data, BetaBernoulliConjugate)
@@ -41,6 +52,15 @@ class ABTest:
     def calculate_bayesian_stats(
         self, credible_interval: int = 90, rope: int = 3
     ) -> Dict:
+        """
+        Calculate bayesian statistics of AB test.
+
+        Args
+            credible_interval: int = 90
+                Bayesian credible interval.
+            rope: int = 3
+                Bayesian Region Of Practical Equivalence (ROPE).
+        """
         # validate inputs
         validated_params = CalculateBayesianStatsParams(
             credible_interval=credible_interval, rope=rope
@@ -98,6 +118,13 @@ class ABTest:
         return self.bayes_stats
 
     def calculate_frequentist_stats(self, significance_level: int = 5) -> Dict:
+        """
+        Calculate frequentist statistics of AB test.
+
+        Args
+            significance_level: int = 5
+                Frequentist significance level for a hypothesis test.
+        """
         # validate inputs
         validated_params = CalculateFrequentistStatsParams(
             significance_level=significance_level
@@ -143,6 +170,19 @@ class ABTest:
     def calculate_ab_stats(
         self, credible_interval: int = 90, rope: int = 3, significance_level: int = 5
     ) -> Dict:
+        """
+        Call the following methods in sequence:
+            (1) self.calculate_bayesian_stats
+            (2) self.calculate_frequentist_stats
+
+        Args
+            credible_interval: int = 90
+                Bayesian credible interval.
+            rope: int = 3
+                Bayesian Region Of Practical Equivalence (ROPE).
+            significance_level: int = 5
+                Frequentist significance level for a hypothesis test.
+        """
         # validate inputs
         bayes_params = CalculateBayesianStatsParams(
             credible_interval=credible_interval, rope=rope
@@ -162,10 +202,20 @@ class ABTest:
         return {k: v for k, v in self.ab_stats.items() if not k.endswith("dist")}
 
     def plot_ab_dists(self, fig, axs, stats_title: bool = False):
+        """
+        Plot prior, likelihood and/or posterior distributions.
+
+        Args:
+            fig: matplotlib.figure.Figure
+                plt figure to plot
+            ax: matplotlib.axes._axes.Axes
+                plt ax to plot
+            stats_title: bool = False
+                Boolean to indicate whether to print statistical results
+                on plot title.
+        """
         # validate inputs
-        validated_params = PlotAbDistsParams(
-            fig=fig, axs=axs, stats_title=stats_title
-        )
+        validated_params = PlotAbDistsParams(fig=fig, axs=axs, stats_title=stats_title)
 
         # define style to use
         plt.style.use("fivethirtyeight")
@@ -234,24 +284,19 @@ class ABTest:
             x=self.bayes_stats["lift_dist"],
             color="g",
             ax=validated_params.axs[1],
-            linewidth=1.5
+            linewidth=1.5,
         )
         # get lift kde
-        lift_kde =  axs[1].get_lines()[0]
+        lift_kde = axs[1].get_lines()[0]
         # get boolean kde within confidence interval
         lift_kde_conf_int_bool = (
             lift_kde.get_xdata() >= self.bayes_stats["lift_cred_lower_limit"]
-        ) & (
-            lift_kde.get_xdata() <= self.bayes_stats["lift_cred_upper_limit"]
-        )
+        ) & (lift_kde.get_xdata() <= self.bayes_stats["lift_cred_upper_limit"])
         # filter x and y data with kde boolean
         lift_kde_conf_int_x = lift_kde.get_xdata()[lift_kde_conf_int_bool]
         lift_kde_conf_int_y = lift_kde.get_ydata()[lift_kde_conf_int_bool]
         axs[1].fill_between(
-            x=lift_kde_conf_int_x, 
-            y1=0, 
-            y2=lift_kde_conf_int_y, 
-            color="g"
+            x=lift_kde_conf_int_x, y1=0, y2=lift_kde_conf_int_y, color="g"
         )
         # plot details
         validated_params.axs[1].axvline(

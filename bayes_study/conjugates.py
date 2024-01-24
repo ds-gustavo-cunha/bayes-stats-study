@@ -27,6 +27,30 @@ class BetaBernoulliConjugate:
         likelihood_trials: Union[int, None] = None,
         sampling_size: int = 10_000,
     ) -> None:
+        """
+        Beta-Bernoulli conjugate distributions object to
+        perform bayes update and easily get into posterior
+        distribution (another beta distribution).
+
+        Args
+            prior_alpha: int
+                Alpha of prior beta distribution.
+            prior_beta: int
+                Beta of prior beta distribution.
+            likelihood_dist: Union[List[int], None] = None
+                List with Bernoulli trials that will be used to
+                estimate Bernoulli likelihood and take adventage
+                of conjugate distributions.
+            likelihood_prob: Union[float, None] = None
+                Probability of the Bernoulli trials of the
+                likelihood distribution.
+            likelihood_trials: Union[int, None] = None,
+                Number of Bernoulli trials of the
+                likelihood distribution.
+            sampling_size: int = 10_000
+                Size of the `rvs` sampling that will be used on
+                Beta and Bernoulli distributions.
+        """
         # validate the input parameters
         validated_params = BetaBernoulliConjugateParams(
             prior_alpha=prior_alpha,
@@ -64,6 +88,9 @@ class BetaBernoulliConjugate:
         self.sample_posterior()
 
     def sample_prior(self):
+        """
+        Sample from prior Beta distribution.
+        """
         # sample from betar prior given inputs
         self.prior_dist = beta(self.prior_alpha, self.prior_beta).rvs(
             size=self.sampling_size
@@ -72,6 +99,9 @@ class BetaBernoulliConjugate:
         self.sample_iter["prior"] += 1
 
     def sample_likelihood(self):
+        """
+        Sample from Bernoulli likelihood distribution.
+        """
         # sample from bernoulli likelihood given inputs
         self.likelihood_dist = bernoulli.rvs(
             p=self.likelihood_prob, size=self.likelihood_trials
@@ -81,6 +111,10 @@ class BetaBernoulliConjugate:
         self.sample_iter["likelihood"] += 1
 
     def sample_posterior(self):
+        """
+        Sample from posterior given the Beta prior and
+        Bernoulli likelihood conjugates.
+        """
         # check if prior and likelihood were already sampled
         # for the given iteration
         if (self.sample_iter["prior"] == self.sample_iter["likelihood"]) and (
@@ -106,12 +140,22 @@ class BetaBernoulliConjugate:
             )
 
     def update_prior(self):
+        """
+        Update prior so as to be equal to previous posterior.
+        """
         # update prior distribution params to make them equal to
         # previous iteration posterior
         self.prior_alpha = self.posterior_alpha
         self.prior_beta = self.posterior_beta
 
     def update_distributions(self):
+        """
+        Call the following methods in sequence:
+            (1) self.update_prior()
+            (2) self.sample_prior()
+            (3) self.sample_likelihood()
+            (4) self.sample_posterior()
+        """
         # update prior distribution to be equal to
         # previous previous posterior
         self.update_prior()
@@ -139,6 +183,19 @@ class BetaBernoulliConjugate:
         plot_prior: bool = True,
         plot_posterior: bool = True,
     ):
+        """
+        Plot prior, likelihood and/or posterior distributions.
+
+        Args:
+            fig: matplotlib.figure.Figure
+                plt figure to plot
+            ax: matplotlib.axes._axes.Axes
+                plt ax to plot
+            plot_prior: bool = True
+                Boolean to indicate whether to plot prior distribution or not.
+            plot_posterior: bool = True
+                Boolean to indicate whether to plot posterior distribution or not.
+        """
         # validate inputs
         params = BetaBernoulliConjugatePlotDists(
             fig=fig,
@@ -189,10 +246,10 @@ class BetaBernoulliConjugate:
             linewidth=1.5,
             label="Likelihood prob",
         )
-        prior_msg = (
-            f"Prior:              beta({self.prior_alpha},{self.prior_beta})\n"
+        prior_msg = f"Prior:              beta({self.prior_alpha},{self.prior_beta})\n"
+        posterior_msg = (
+            f"Posterior:          beta({self.posterior_alpha},{self.posterior_beta})\n"
         )
-        posterior_msg = f"Posterior:          beta({self.posterior_alpha},{self.posterior_beta})\n"
         plt.title(
             f"{prior_msg if params.plot_prior else ''}"
             f"Likelihood dist:    bernoulli(p={self.likelihood_prob},size={self.likelihood_trials})\n"

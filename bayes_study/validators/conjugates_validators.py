@@ -7,29 +7,39 @@ import numpy as np
 # pydantic validators
 class BetaBernoulliConjugateParams(BaseModel, extra="forbid"):
     prior_alpha: int = Field(
-        default=..., ge=1, description="Alpha parameter of prior beta distribution."
+        default=..., ge=1, description="Alpha of prior beta distribution."
     )
     prior_beta: int = Field(
-        default=..., ge=1, description="Beta parameter of prior beta distribution."
+        default=..., ge=1, description="Beta of prior beta distribution."
     )
     likelihood_dist: Union[List[int], None] = Field(
-        default=None, description="Numpy array with Bernoulli trials."
+        default=None,
+        description=(
+            "List with Bernoulli trials that will be used to "
+            "estimate Bernoulli likelihood and take adventage "
+            "of conjugate distributions."
+        ),
     )
     likelihood_prob: Union[float, None] = Field(
         default=None,
         ge=0.0,
         lt=1.0,
-        description="Probability of success on likelihood Bernoulli distribution.",
+        description=(
+            "Probability of the Bernoulli trials of the " "likelihood distribution."
+        ),
     )
     likelihood_trials: Union[int, None] = Field(
         default=None,
         ge=1,
-        description="Number of trials of likelihood Bernoulli distribution.",
+        description=("Number of Bernoulli trials of the " "likelihood distribution."),
     )
     sampling_size: int = Field(
         default=10_000,
         ge=10,
-        description="Sampling size for `rvs` sampling method of distributions.",
+        description=(
+            "Size of the `rvs` sampling that will be used on "
+            "Beta and Bernoulli distributions."
+        ),
     )
 
     @field_validator(__field="likelihood_dist")
@@ -55,14 +65,14 @@ class BetaBernoulliConjugateParams(BaseModel, extra="forbid"):
 
 
 class BetaBernoulliConjugatePlotDists(BaseModel, extra="forbid"):
-    fig: Any = Field(default=..., description="matplotlib.figure.Figure")
-    ax: Any = Field(default=..., description="matplotlib.axes._axes.Axes")
+    fig: Any = Field(default=..., description="matplotlib.figure.Figure to plot.")
+    ax: Any = Field(default=..., description="matplotlib.axes._axes.Axes to plot.")
 
     plot_prior: bool = Field(
         default=True,
-        description="Boolean to indicate whether to plot prior distribution.",
+        description="Boolean to indicate whether to plot prior distribution or not.",
     )
     plot_posterior: bool = Field(
         default=True,
-        description="Boolean to indicate whether to plot posterior distribution.",
+        description="Boolean to indicate whether to plot posterior distribution or not.",
     )
