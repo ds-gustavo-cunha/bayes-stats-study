@@ -11,19 +11,75 @@ from bayes_study.ab_test import ABTest
 
 # create a ArgumentParser
 cli_parser = argparse.ArgumentParser(
-    description="Script to display animated distribution update."
+    prog=os.path.basename(sys.argv[0]),
+    description="Script to display animated distribution update.",
+    add_help=True,
 )
 
 # add arguments
-cli_parser.add_argument("--prior_alpha", type=int, default=1, nargs="?")
-cli_parser.add_argument("--prior_beta", type=int, default=1, nargs="?")
-cli_parser.add_argument("--likelihood_prob", type=float, default=0.7, nargs="?")
-cli_parser.add_argument("--likelihood_trials", type=int, default=10, nargs="?")
-cli_parser.add_argument("--sampling_size", type=int, default=1_000, nargs="?")
-cli_parser.add_argument("--plot_prior", type=bool, default=True, nargs="?")
-cli_parser.add_argument("--plot_posterior", type=bool, default=True, nargs="?")
-cli_parser.add_argument("--num_frames", type=int, default=1_000, nargs="?")
-cli_parser.add_argument("--ms_interval", type=int, default=1_000, nargs="?")
+cli_parser.add_argument(
+    "--prior_alpha",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Alpha of prior beta distribution.",
+)
+cli_parser.add_argument(
+    "--prior_beta",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Beta of prior beta distribution.",
+)
+cli_parser.add_argument(
+    "--likelihood_prob",
+    type=float,
+    default=0.7,
+    nargs="?",
+    help="Probability of the Bernoulli trials of the likelihood distribution.",
+)
+cli_parser.add_argument(
+    "--likelihood_trials",
+    type=int,
+    default=10,
+    nargs="?",
+    help="Number of Bernoulli trials of the likelihood distribution.",
+)
+cli_parser.add_argument(
+    "--sampling_size",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Size of the `rvs` sampling that will be used on Beta and Bernoulli distributions.",
+)
+cli_parser.add_argument(
+    "--plot_prior",
+    type=bool,
+    default=True,
+    nargs="?",
+    help="Boolean to indicate whether to plot prior distribution or not.",
+)
+cli_parser.add_argument(
+    "--plot_posterior",
+    type=bool,
+    default=True,
+    nargs="?",
+    help="Boolean to indicate whether to plot posterior distribution or not.",
+)
+cli_parser.add_argument(
+    "--num_frames",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Number of frames to display (equal to number of updates)",
+)
+cli_parser.add_argument(
+    "--ms_interval",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Interval in milli-seconds between plot displays.",
+)
 
 # parse CLI arguments
 cli_args = cli_parser.parse_args()

@@ -10,24 +10,90 @@ from bayes_study.ab_test import ABTest
 
 
 # create a ArgumentParser
-cli_parser = argparse.ArgumentParser(description="Script to display animated AB test.")
+cli_parser = argparse.ArgumentParser(
+    prog=os.path.basename(sys.argv[0]),
+    description="Script to display animated AB test.",
+    add_help=True,
+)
 
 # add arguments
-cli_parser.add_argument("--control_prior_alpha", type=int, default=1, nargs="?")
-cli_parser.add_argument("--control_prior_beta", type=int, default=1, nargs="?")
-cli_parser.add_argument("--control_likelihood_prob", type=float, default=0.7, nargs="?")
-cli_parser.add_argument("--control_likelihood_trials", type=int, default=10, nargs="?")
-cli_parser.add_argument("--treatment_prior_alpha", type=int, default=1, nargs="?")
-cli_parser.add_argument("--treatment_prior_beta", type=int, default=1, nargs="?")
 cli_parser.add_argument(
-    "--treatment_likelihood_prob", type=float, default=0.75, nargs="?"
+    "--control_prior_alpha",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Alpha of prior beta distribution for control group.",
 )
 cli_parser.add_argument(
-    "--treatment_likelihood_trials", type=int, default=10, nargs="?"
+    "--control_prior_beta",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Beta of prior beta distribution for control group.",
 )
-cli_parser.add_argument("--sampling_size", type=int, default=1_000, nargs="?")
-cli_parser.add_argument("--num_frames", type=int, default=1_000, nargs="?")
-cli_parser.add_argument("--ms_interval", type=int, default=1_000, nargs="?")
+cli_parser.add_argument(
+    "--control_likelihood_prob",
+    type=float,
+    default=0.7,
+    nargs="?",
+    help="Probability of the Bernoulli trials of the likelihood distribution for control group.",
+)
+cli_parser.add_argument(
+    "--control_likelihood_trials",
+    type=int,
+    default=10,
+    nargs="?",
+    help="Number of Bernoulli trials of the likelihood distribution for control group.",
+)
+cli_parser.add_argument(
+    "--treatment_prior_alpha",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Alpha of prior beta distribution for treatment group.",
+)
+cli_parser.add_argument(
+    "--treatment_prior_beta",
+    type=int,
+    default=1,
+    nargs="?",
+    help="Beta of prior beta distribution for treatment group.",
+)
+cli_parser.add_argument(
+    "--treatment_likelihood_prob",
+    type=float,
+    default=0.75,
+    nargs="?",
+    help="Probability of the Bernoulli trials of the likelihood distribution for treatment group.",
+)
+cli_parser.add_argument(
+    "--treatment_likelihood_trials",
+    type=int,
+    default=10,
+    nargs="?",
+    help="Number of Bernoulli trials of the likelihood distribution for treatment group.",
+)
+cli_parser.add_argument(
+    "--sampling_size",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Size of the `rvs` sampling that will be used on Beta and Bernoulli distributions.",
+)
+cli_parser.add_argument(
+    "--num_frames",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Number of frames to display (equal to number of updates)",
+)
+cli_parser.add_argument(
+    "--ms_interval",
+    type=int,
+    default=1_000,
+    nargs="?",
+    help="Interval in milli-seconds between plot displays.",
+)
 
 # parse CLI arguments
 cli_args = cli_parser.parse_args()

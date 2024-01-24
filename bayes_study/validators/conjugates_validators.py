@@ -25,13 +25,13 @@ class BetaBernoulliConjugateParams(BaseModel, extra="forbid"):
         ge=0.0,
         lt=1.0,
         description=(
-            "Probability of the Bernoulli trials of the " "likelihood distribution."
+            "Probability of the Bernoulli trials of the likelihood distribution."
         ),
     )
     likelihood_trials: Union[int, None] = Field(
         default=None,
         ge=1,
-        description=("Number of Bernoulli trials of the " "likelihood distribution."),
+        description=("Number of Bernoulli trials of the likelihood distribution."),
     )
     sampling_size: int = Field(
         default=10_000,
