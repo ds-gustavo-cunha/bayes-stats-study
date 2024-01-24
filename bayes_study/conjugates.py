@@ -218,6 +218,7 @@ class BetaBernoulliConjugate:
                 common_norm=True,
                 fill=False,
                 ax=params.ax,
+                warn_singular=False # zero-variance warning, kde not plot
             )
         sns.kdeplot(
             x=self.likelihood_dist,
@@ -226,6 +227,7 @@ class BetaBernoulliConjugate:
             common_norm=True,
             fill=True,
             ax=params.ax,
+            warn_singular=False # zero-variance warning, kde not plot
         )
         if params.plot_posterior:
             sns.kdeplot(
@@ -235,6 +237,7 @@ class BetaBernoulliConjugate:
                 common_norm=True,
                 fill=False,
                 ax=params.ax,
+                warn_singular=False # zero-variance warning, kde not plot
             )
         # define plot details
         params.ax.axvline(
@@ -263,4 +266,3 @@ class BetaBernoulliConjugate:
         plt.legend(bbox_to_anchor=(1.01, 1))
         plt.xticks([i / 10 for i in range(0, 10 + 1)])
         plt.xlim(-0.01, 1.01)
-        plt.show()

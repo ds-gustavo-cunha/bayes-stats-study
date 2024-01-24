@@ -230,12 +230,14 @@ class ABTest:
             color="r",
             label="control",
             ax=validated_params.axs[0],
+            warn_singular=False # zero-variance warning, kde not plot
         )
         sns.kdeplot(
             x=self.treatment_bbc.posterior_dist,
             color="b",
             label="treatment",
             ax=validated_params.axs[0],
+            warn_singular=False # zero-variance warning, kde not plot
         )
         # define title variables
         control_report = f"  Control                     Beta({self.control_bbc.posterior_alpha}, {self.control_bbc.posterior_beta})"
@@ -285,6 +287,7 @@ class ABTest:
             color="g",
             ax=validated_params.axs[1],
             linewidth=1.5,
+            warn_singular=False # zero-variance warning, kde not plot
         )
         # get lift kde
         lift_kde = axs[1].get_lines()[0]
@@ -327,4 +330,3 @@ class ABTest:
         validated_params.axs[1].set_ylabel("Probability\ndensity", loc="bottom")
         validated_params.axs[1].set_xlabel("Parameter Value", loc="left")
         validated_params.axs[1].legend(bbox_to_anchor=(1.01, 1))
-        plt.show()
