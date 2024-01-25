@@ -57,9 +57,6 @@ class ABTest(BaseModel, extra="forbid"):
         """
         # pydantic class
         super().__init__(control_data=control_data, treatment_data=treatment_data)
-        # assign input as attributes
-        self.control_data = control_data
-        self.treatment_data = treatment_data
 
     def calculate_bayesian_stats(
         self, credible_interval: int = 90, rope: int = 3

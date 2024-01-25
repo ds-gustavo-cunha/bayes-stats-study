@@ -7,7 +7,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import beta, bernoulli
-from bayes_study.validators.conjugates_validators import BetaBernoulliConjugatePlotDists
+from bayes_study.validators.conjugates_validators import (
+    BetaBernoulliConjugatePlotDists,
+    _validate_likelihood_dist,
+)
 
 
 #####################
@@ -54,29 +57,14 @@ class BetaBernoulliConjugate(BaseModel, extra="forbid"):
     _posterior_beta: Union[int, None] = PrivateAttr(default=None)
     _likelihood_success: Union[int, None] = PrivateAttr(default=None)
     _sample_iter: Union[Dict, None] = PrivateAttr(default=None)
-    _prior_dist: Union[List, None] = PrivateAttr(default=None)
-    _likelihood_dist: Union[List, None] = PrivateAttr(default=None)
-    _posterior_dist: Union[List, None] = PrivateAttr(default=None)
+    _prior_dist: Union[List[float], None] = PrivateAttr(default=None)
+    _likelihood_dist: Union[List[float], None] = PrivateAttr(default=None)
+    _posterior_dist: Union[List[float], None] = PrivateAttr(default=None)
 
     @field_validator(__field="likelihood_dist", mode="before")
     @classmethod
-    def validate_likelihood_dist(cls, value: Union[List, None]):
-        # if value is not None
-        if value is not None:
-            # if not a list
-            if not isinstance(value, List):
-                raise ValueError("`likelihood_dist` must be a list.")
-            # iterate over items
-            for i in value:
-                # if item not 0 or 1
-                # as it is supposed to be the data
-                # from a bernoulli distribution
-                if i not in [0, 1]:
-                    raise ValueError(
-                        "Items of `likelihood_dist` must be integers: "
-                        " either 0s or 1s. "
-                        f"Found `{i}`."
-                    )
+    def validate_likelihood_dist(cls, value: Union[List[int], None]):
+        return _validate_likelihood_dist(value=value)
 
     def __init__(
         self,
@@ -120,22 +108,18 @@ class BetaBernoulliConjugate(BaseModel, extra="forbid"):
             likelihood_trials=likelihood_trials,
             sampling_size=sampling_size,
         )
-        # define object attributes
-        self.prior_alpha = prior_alpha
-        self.prior_beta = prior_beta
-        if likelihood_dist is not None:
-            self.likelihood_prob = np.mean(np.array(likelihood_dist))
-            self.likelihood_trials = len(np.array(likelihood_dist))
-        elif (likelihood_prob is not None) and (likelihood_trials is not None):
-            self.likelihood_prob = likelihood_prob
-            self.likelihood_trials = likelihood_trials
-        else:
+        # if a likelihood distribution was input
+        if self.likelihood_dist is not None:
+            self.likelihood_prob = np.mean(np.array(self.likelihood_dist))
+            self.likelihood_trials = len(np.array(self.likelihood_dist))
+        # a likelihood distribution was not input
+        # and likelihood probability and trails are both null
+        elif (self.likelihood_prob is None) or (self.likelihood_trials is None):
             raise ValueError(
                 "At least `likelihood_dist` param or both "
                 "`likelihood_prob and likelihood_trails` params "
                 "must not be None!"
             )
-        self.sampling_size = sampling_size
         # define a dict to control paired samples
         self._sample_iter = dict(prior=0, likelihood=0, posterior=0)
         # sample from prior and likelihood and posterior
