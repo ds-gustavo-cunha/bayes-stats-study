@@ -1,3 +1,9 @@
+install_bayes_study:
+	@pip install -e .
+
+pip_update:
+	@python3.9 -m pip install --upgrade pip
+
 black:
 	@black app bayes_study
 
