@@ -15,7 +15,7 @@ setup(name='bayes_study', # project name
       version="0.1", # project version
       description="AB testing study: comparing frequentist and bayesian approach.", # project description
       packages=find_packages(), # find package from source folder
-      install_requires=project_lib_requirements, # install packages in requirements list
+      # install_requires=project_lib_requirements, # install packages in requirements list
       # test_suite='tests', # folder with tests
       # include_package_data: to install data from MANIFEST.in
       include_package_data=False, # include data package inside package
