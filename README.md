@@ -1,3 +1,9 @@
+
+https://en.wikipedia.org/wiki/Bayes%27_theorem
+https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers
+https://allendowney.github.io/ThinkBayes2/index.html
+https://statswithr.github.io/book/the-basics-of-bayesian-statistics.html
+
 # BAYES STUDY PROJECT
 
 ### PROBLEM

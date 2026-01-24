@@ -18,3 +18,6 @@ plot_update_animation:
 
 test_plot_update_params:
 	python3 bayes_study/plot_update_animation.py --likelihood_prob 0.3
+
+streamlit:
+	streamlit run app/main.py
