@@ -61,7 +61,7 @@ class BetaBernoulliConjugate(BaseModel, extra="forbid"):
     _likelihood_dist: Union[List[float], None] = PrivateAttr(default=None)
     _posterior_dist: Union[List[float], None] = PrivateAttr(default=None)
 
-    @field_validator(__field="likelihood_dist", mode="before")
+    @field_validator("likelihood_dist", mode="before")
     @classmethod
     def validate_likelihood_dist(cls, value: Union[List[int], None]):
         return _validate_likelihood_dist(value=value)
